@@ -82,3 +82,9 @@ npm install --save-dev eslint @typescript-eslint/parser @typescript-eslint/eslin
   }
 }
 ```
+
+4. 실행해보기
+```
+npm run serve
+```
+<image src="https://user-images.githubusercontent.com/67398691/113802120-1ac56f00-9795-11eb-8346-e090aa96111d.png" width="600" alt="vue.js index page"/>
