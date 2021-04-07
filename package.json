@@ -51,7 +51,12 @@
       "parser": "@typescript-eslint/parser",
       "ecmaVersion": 2020
     },
-    "rules": {}
+    "rules": {
+      
+    }
+  },
+  "prettier": {
+    "endOfLine": "auto"
   },
   "browserslist": [
     "> 1%",

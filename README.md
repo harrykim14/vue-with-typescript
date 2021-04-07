@@ -57,8 +57,223 @@ vue add vuex
 ```
 
 - 강의에서 사용된 TSlint는 2019년 이후로 ESLint로 마이그레이션됨 [참고 자료](https://velog.io/@kyusung/eslint-tslint-config)
-- vue add eslint 명령어와 함께 eslint를 prettier로 설정
 
 ```
 npm install --save-dev eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin
+```
+
+- 루트 폴더에 .eslintrc 파일을 생성하고 설정을 작성하기
+
+```
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint",
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "rules": {
+    "no-console": 1,
+    "no-loops/no-loops": 2
+  }
+}
+```
+
+4. 명령어 사용해보기
+
+```
+npm run serve
+```
+
+<image src="https://user-images.githubusercontent.com/67398691/113802120-1ac56f00-9795-11eb-8346-e090aa96111d.png" width="600" alt="vue.js index page"/>
+(이미지1. Vue 프로젝트를 실행하여 localhost:8080으로 접속한 화면)
+
+```
+npm run build
+/*
+\  Building for production...Starting type checking service...
+Using 1 worker with 2048MB memory limit
+\  Building for production...
+
+ DONE  Compiled successfully in 9962ms                                 오전 11:50:05
+  File                                 Size                 Gzipped
+
+  dist\js\chunk-vendors.ce698506.js    138.11 KiB           47.73 KiB
+  dist\js\app.330dc3d5.js              6.25 KiB             2.38 KiB
+  dist\js\about.d3f7cc1a.js            0.44 KiB             0.31 KiB
+  dist\css\app.26e87896.css            0.42 KiB             0.26 KiB
+
+  Images and other types of assets omitted.
+
+ DONE  Build complete. The dist directory is ready to be deployed.
+ INFO  Check out deployment instructions at https://cli.vuejs.org/guide/deployment.html
+*/
+
+npm run lint
+ DONE  No lint errors found!
+```
+
+5. Class-Based 컴포넌트 만들기
+
+```javascript
+// 기존 JS 문법
+Vue.component("App", {
+  // ...
+});
+```
+
+```typescript
+// TS에서 컴포넌트 만드는 법
+@Component
+export default class App extends Vue {}
+```
+
+- 컴포넌트란? - [공식 문서](https://kr.vuejs.org/v2/guide/components.html#%EC%BB%B4%ED%8F%AC%EB%84%8C%ED%8A%B8-%EC%9E%91%EC%84%B1)
+  - 컴포넌트는 부모-자식 관계에서 가장 일반적으로 함께 사용하기 위한 것이며 Vue.js에서 부모-자식 컴포넌트 관계는 props는 아래로, events 위로 라고 요약 할 수 있다.
+
+```javascript
+// 기존 JS에서 props 넘겨주기
+Vue.component("child", {
+  props: ["message"],
+});
+```
+
+```typescript
+// TS에서 props 정의하기
+@Component
+export default class Children extends Vue {
+  @Prop() parentMessage!: string;
+}
+```
+
+- 자식 객체의 prop을 동적으로 변경하기
+
+```html
+<template>
+  <children :parentMessage="message"></children>
+</template>
+<script lang="ts">
+  ...
+  export default class Home extends Vue {
+    message = "hello world";
+  }
+  ...
+</script>
+```
+
+- Method Decorator : 해당 메서드가 객체에 정의되기 전에 추가적인 행위가 있은 후에 객체에 정의됨
+
+```typescript
+function enumerable(value: boolean) {
+  return function (
+    target: any,
+    propertyKey: string,
+    descriptor: PropertyDescriptor
+  ) {
+    descriptor.enumerable = value;
+  };
+}
+// ES6의 Object.defineProperty(obj, prop, descriptor)와 같다
+```
+
+[참고1](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty) [참고2](https://haeguri.github.io/2019/08/25/typescript-decorator/)
+
+1. @Watch
+
+```javascript
+const watchExample = new Vue({
+  el: "#watch-example",
+  data: {
+    question: "",
+    answer: "질문 후에 대답 할 수 있습니다",
+  },
+  watch: {
+    question: function (newQuestion) {
+      this.answer = "입력을 기다리는 중...";
+    },
+  },
+});
+```
+
+```typescript
+@Component
+export default class WatchExample exetends Vue {
+  question: string = '';
+  answer: string = '질문을 하기 전까지는 대답할 수 없습니다.';
+
+  @Watch('question')
+  watcher() {
+    this.answer = '입력을 기다리는 중...';
+  }
+}
+```
+
+2. @Emit
+
+```javascript
+export default {
+  data() {
+    return {
+      count: 0,
+    };
+  },
+  methods: {
+    addToCount(n) {
+      this.count += n;
+      this.$emit("add-to-count", n);
+    },
+    resetCount() {
+      this.count = 0;
+      this.$emit("reset");
+    },
+    returnValue() {
+      this.$emit("return-value", 10);
+    },
+    promise() {
+      const promise = new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(20);
+        }, 0);
+      });
+      promise.then((value) => {
+        this.$emit("promise", value);
+      });
+    },
+  },
+};
+```
+
+```typescript
+@Component
+export default class EmitComponent extends Vue {
+  count = 0;
+
+  @Emit()
+  addToCount(n: number) {
+    this.count += n;
+  }
+
+  @Emit("reset")
+  resetCount() {
+    this.count = 0;
+  }
+
+  @Emit()
+  returnValue() {
+    return 10;
+  }
+
+  @Emit()
+  promise() {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(20);
+      }, 0);
+    });
+  }
+}
 ```

@@ -1,18 +1,25 @@
 <template>
   <div class="home">
     <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+    <children @counter="counter"></children>
+    <p>부모에서 숫자를 보여줍니다. : {{ count }}</p>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
+import children from "@/components/children.vue";
 
 @Component({
   components: {
-    HelloWorld,
+    children,
   },
 })
-export default class Home extends Vue {}
+export default class Home extends Vue {
+  count = 0;
+
+  counter() {
+    this.count++;
+  }
+}
 </script>
