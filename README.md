@@ -36,3 +36,49 @@ Vue CLI v4.5.12
 🗃  Initializing git repository...
 ⚙️  Installing CLI plugins. This might take a while...
 ```
+
+3. vue-cli로 plug-in 설치하기
+   - Vue CLI v3.4.0 (강의에서 사용하는 버전) 과는 달리 `Check the features needed for your project:`라는 문구는 출력되지 않으며 vue add /plug-in name/으로 설치할 수 있다
+
+```
+vue add typescript
+? Use class-style component syntax? Yes
+? Use Babel alongside TypeScript (required for modern mode, auto-detected polyfills, transpiling JSX)? No
+? Convert all .js files to .ts? Yes
+? Allow .js files to be compiled? Yes
+? Skip type checking of all declaration files (recommended for apps)? Yes (default)
+
+vue add router
+? Use history mode for router? (Requires proper server setup for index fallback in production) Yes
+
+vue add eslint
+
+vue add vuex
+```
+
+- 강의에서 사용된 TSlint는 2019년 이후로 ESLint로 마이그레이션됨 [참고 자료](https://velog.io/@kyusung/eslint-tslint-config)
+
+```
+npm install --save-dev eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin
+```
+
+- 루트 폴더에 .eslintrc 파일을 생성하고 설정을 작성하기
+
+```
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint",
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "rules": {
+    "no-console": 1,
+    "no-loops/no-loops": 2
+  }
+}
+```
