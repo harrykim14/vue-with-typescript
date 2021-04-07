@@ -57,28 +57,8 @@ vue add vuex
 ```
 
 - 강의에서 사용된 TSlint는 2019년 이후로 ESLint로 마이그레이션됨 [참고 자료](https://velog.io/@kyusung/eslint-tslint-config)
+- vue add eslint 명령어와 함께 eslint를 prettier로 설정
 
 ```
 npm install --save-dev eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin
-```
-
-- 루트 폴더에 .eslintrc 파일을 생성하고 설정을 작성하기
-
-```
-{
-  "root": true,
-  "parser": "@typescript-eslint/parser",
-  "plugins": [
-    "@typescript-eslint",
-  ],
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended"
-  ],
-  "rules": {
-    "no-console": 1,
-    "no-loops/no-loops": 2
-  }
-}
 ```
