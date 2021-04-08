@@ -383,4 +383,96 @@ export default class Dropdown extends Mixins(toggle)
 </div>
 </details>
 
-6. Interface로 Vuex 설계하기
+<details>
+<summary>6. Interface로 Vuex 설계하기</summary>
+  <div markdown="6">
+   (1) Event bus 활용하기
+
+```typescript
+// event-bus.ts라는 파일을 새로 생성하여 Vue의 인스턴스만 생성하게 하고 이를 이벤트 버스로 사용
+import Vue from "vue";
+export default new Vue();
+```
+
+```typescript
+// a.vue
+<template>
+  <div>
+    <input type="text" v-model="text" />
+    <button @click="click">B로 전송</button>
+  </div>
+</template>
+
+<script lang="ts">
+import { Vue, Component } from "vue-property-decorator";
+import Bus from "@/common/event-bus";
+
+@Component
+export default class A extends Vue {
+  text = "";
+  click(): void {
+    Bus.$emit("sendText", this.text);
+  }
+}
+</script>
+```
+
+```typescript
+// b.vue
+<template>
+  <div>A에서 작성한 메세지는? => {{ text }}</div>
+</template>
+
+<script lang="ts">
+import { Vue, Component } from "vue-property-decorator";
+import Bus from "@/common/event-bus";
+
+@Component
+export default class A extends Vue {
+  text = "";
+  created(): void {
+    Bus.$on("sendText", (text: string) => {
+      this.text = text;
+    });
+  }
+}
+</script>
+
+<style scoped></style>
+
+```
+
+```typescript
+// App.vue
+<template>
+  <div>
+    <A />
+    <B />
+  </div>
+</template>
+
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
+import A from "@/components/a.vue";
+import B from "@/components/b.vue";
+@Component({
+  components: {
+    A,
+    B,
+  },
+})
+export default class App extends Vue {}
+</script>
+
+<style></style>
+
+```
+
+- App.vue에서 보는 것 처럼 부모자식이 아닌 A와 B 컴포넌트에 props를 전달하지 않아도 Event-bus를 사용함으로써 객체간 정보 전달이 가능함
+- 하지만 프로젝트의 크기가 커지고 컴포넌트 개수가 늘어날수록 이벤트버스를 사용한 방식은 데이터의 흐름 파악이 어렵게 된다
+
+  (2) Vuex를 사용하여 상태 관리하기
+  <image src="https://user-images.githubusercontent.com/67398691/113967468-02745380-986c-11eb-9bc2-28f82825ee61.png" width="800" alt="organizing status with vuex"/>
+
+</div>
+</details>
