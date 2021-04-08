@@ -37,7 +37,9 @@ Vue CLI v4.5.12
 ⚙️  Installing CLI plugins. This might take a while...
 ```
 
-3. vue-cli로 plug-in 설치하기
+<details>
+<summary>3. vue-cli로 plug-in 설치하기</summary>
+<div markdown="3">
    - Vue CLI v3.4.0 (강의에서 사용하는 버전) 과는 달리 `Check the features needed for your project:`라는 문구는 출력되지 않으며 vue add /plug-in name/으로 설치할 수 있다
 
 ```
@@ -82,6 +84,9 @@ npm install --save-dev eslint @typescript-eslint/parser @typescript-eslint/eslin
   }
 }
 ```
+
+</div>
+</details>
 
 4. 명령어 사용해보기
 
@@ -383,4 +388,184 @@ export default class Dropdown extends Mixins(toggle)
 </div>
 </details>
 
-6. Interface로 Vuex 설계하기
+<details>
+<summary>6. Interface로 Vuex 설계하기</summary>
+  <div markdown="6">
+   (1) Event bus 활용하기
+
+```typescript
+// event-bus.ts라는 파일을 새로 생성하여 Vue의 인스턴스만 생성하게 하고 이를 이벤트 버스로 사용
+import Vue from "vue";
+export default new Vue();
+```
+
+```typescript
+// a.vue
+<template>
+  <div>
+    <input type="text" v-model="text" />
+    <button @click="click">B로 전송</button>
+  </div>
+</template>
+
+<script lang="ts">
+import { Vue, Component } from "vue-property-decorator";
+import Bus from "@/common/event-bus";
+
+@Component
+export default class A extends Vue {
+  text = "";
+  click(): void {
+    Bus.$emit("sendText", this.text);
+  }
+}
+</script>
+```
+
+```typescript
+// b.vue
+<template>
+  <div>A에서 작성한 메세지는? => {{ text }}</div>
+</template>
+
+<script lang="ts">
+import { Vue, Component } from "vue-property-decorator";
+import Bus from "@/common/event-bus";
+
+@Component
+export default class A extends Vue {
+  text = "";
+  created(): void {
+    Bus.$on("sendText", (text: string) => {
+      this.text = text;
+    });
+  }
+}
+</script>
+
+<style scoped></style>
+
+```
+
+```typescript
+// App.vue
+<template>
+  <div>
+    <A />
+    <B />
+  </div>
+</template>
+
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
+import A from "@/components/a.vue";
+import B from "@/components/b.vue";
+@Component({
+  components: {
+    A,
+    B,
+  },
+})
+export default class App extends Vue {}
+</script>
+
+<style></style>
+
+```
+
+- App.vue에서 보는 것 처럼 부모자식이 아닌 A와 B 컴포넌트에 props를 전달하지 않아도 Event-bus를 사용함으로써 객체간 정보 전달이 가능함
+- 하지만 프로젝트의 크기가 커지고 컴포넌트 개수가 늘어날수록 이벤트버스를 사용한 방식은 데이터의 흐름 파악이 어렵게 된다
+
+  (2) Vuex를 사용하여 상태 관리하기
+  <image src="https://user-images.githubusercontent.com/67398691/113967468-02745380-986c-11eb-9bc2-28f82825ee61.png" width="800" alt="organizing status with vuex"/>
+  (이미지2. vuex에서 이벤트를 실행하고 상태를 관리하는 모습을 나타낸 도식도)
+
+  (3) Typescript의 Interface와 Generic을 사용한 Vuex store 구현
+
+  ```typescript
+  import Vue from "vue";
+  import Vuex, { StoreOptions } from "vuex";
+
+  Vue.use(Vuex);
+
+  interface State {
+    //... 상태값 인터페이스
+  }
+
+  const Store: StoreOptions<State> = {
+    state: {
+      // 상태값
+    },
+    mutations: {
+      // 변이 함수
+    },
+    actions: {
+      // 변이를 위한 로직 함수
+    },
+    getters: {
+      // 해당 객체의 데이터를 반환하는 함수
+    },
+  };
+
+  export default new Vuex.Store(Store);
+  ```
+
+  - store에 등록하고 나면 `$store`로 접근이 가능하며 사용하고자 하는 함수를 `$store.dispatch("함수명")`이나 `$store.getters.함수명`과 같이 접근 할 수 있다
+
+  (4) Vuex Module Interface를 구현하여 Store 분리하기
+
+  ```typescript
+  import Vue from "vue";
+  import Vuex, { StoreOptions, Modules } from "vuex";
+
+  Vue.use(Vuex);
+
+  interface RootState {
+    /* 루트 인터페이스 */
+  }
+  interface ModuleAState {
+    /* module A State */
+  }
+  interface ModuleBState {
+    /* module B State */
+  }
+
+  const moduleA: Module<ModuleAState, RootState> = {
+    namesaced: true,
+    state: {},
+    mutations: {},
+    actions: {},
+    getters: {},
+  };
+
+  const moduleB: Module<ModuleBState, RootState> = {
+    state: {},
+    mutations: {},
+    actions: {},
+    getters: {},
+  };
+
+  const store: StoreOptions<RootState> = {
+    state: {},
+    modules: { moduleA, moduleB },
+    mutations: {},
+    actions: {},
+    getters: {},
+  };
+
+  export default new Vuex.Store(Store);
+  ```
+
+  - 해당 강의에서는 `created() { console.log(this.$store)}`로 스토어 값을 확인하였지만 Vue 3.0에서는 created()와 beforeCreate()가 lifecycle에서 삭제되었고 setup()으로 변경되어서([참고](https://m.blog.naver.com/dndlab/221952030079)) setup()을 사용해보았으나 console.log()가 찍히지 않았음 → 크롬 확장도구인 Vue devtools를 사용하여 state값을 관찰함
+
+  (이미지3. 크롬 확장도구인 Vue devtools를 사용하여 Store값을 확인)
+
+  - 하지만 setup() 함수에서는 this를 지원하지 않기 때문에([공식문서](https://v3.vuejs.org/guide/composition-api-introduction.html#setup-component-option)) 이를 해결하고자 최상위 RootStore를 변경하였음
+
+  - Vuex 4.0의 공식문서와는 달리 createStore를 불러올 수 없었는데, 이는 npm에서 제공하는 최근 릴리즈가 v3.6.2이기 때문이었음
+
+  - vue와 vuex 및 vue-router를 최신버전(vue@3.0.11, vuex@4.0.0, vue-router@4.0.6)으로 업그레이드하고 예제를 적용해 봄
+    [참고 영상](https://www.youtube.com/watch?v=fh0VboqAc8k) 및 [샘플 코드 브랜치](https://github.com/harrykim14/vue-with-typescript/tree/newVersionOfVuexExample)
+
+  </div>
+  </details>
