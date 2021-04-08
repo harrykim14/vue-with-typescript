@@ -365,7 +365,9 @@ export default class ModelComponent extends Vue {
 }
 ```
 
-(6) Mixins [공식 문서](https://kr.vuejs.org/v2/guide/mixins.html)
+(6) Mixins
+[공식 문서](https://kr.vuejs.org/v2/guide/mixins.html)
+[예제용 브랜치](https://github.com/harrykim14/vue-with-typescript/tree/MixinExample)
 
 - 객체들이 공통적으로 사용하는 기능이 있다면 모듈화 하고싶지 않은가?
 - 그 기능을 담당하는 것이 Mixins
