@@ -1,18 +1,18 @@
 <template>
-  <div id="app">
-    <toggle-btn />
-    <dropdown />
+  <div>
+    <A />
+    <B />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import toggleBtn from "@/components/accordion.vue";
-import dropdown from "@/components/dropdown.vue";
+import A from "@/components/a.vue";
+import B from "@/components/b.vue";
 @Component({
   components: {
-    dropdown,
-    toggleBtn,
+    A,
+    B,
   },
 })
 export default class App extends Vue {}
