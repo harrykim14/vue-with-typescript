@@ -117,7 +117,10 @@ npm run lint
  DONE  No lint errors found!
 ```
 
-5. Class-Based 컴포넌트 만들기
+<details>
+<summary>5. Class-Based 컴포넌트 만들기 (길어져서 flip으로 변경)</summary>
+<div markdown="5">
+(1) @Component
 
 ```javascript
 // 기존 JS 문법
@@ -182,7 +185,7 @@ function enumerable(value: boolean) {
 
 [참고1](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty) [참고2](https://haeguri.github.io/2019/08/25/typescript-decorator/)
 
-1. @Watch
+(2) @Watch
 
 ```javascript
 const watchExample = new Vue({
@@ -212,7 +215,7 @@ export default class WatchExample exetends Vue {
 }
 ```
 
-2. @Emit
+(3) @Emit
 
 ```javascript
 export default {
@@ -278,7 +281,7 @@ export default class EmitComponent extends Vue {
 }
 ```
 
-3. @Provide / @Inject
+(4) @Provide / @Inject
 
 ```javascript
 const symbol = Symbol("baz");
@@ -339,7 +342,7 @@ export class ProvideComponent extends Vue {
 - provide/inject는 위와 같이 사용하기 간편한데에 비해 props는 `:property="value"`와 같이 데이터를 직접 주입해주어야 한다
 - 하지만 provide/inject를 매번 사용한다면 데이터의 흐름을 파악하기 어려울 것
 
-4. @Model (Property decorator)
+(5) @Model (Property decorator)
 
 ```javascript
 export default {
@@ -361,3 +364,21 @@ export default class ModelComponent extends Vue {
   @Model("change", { type: Boolean }) readonly checked!: boolean;
 }
 ```
+
+(6) Mixins [공식 문서](https://kr.vuejs.org/v2/guide/mixins.html)
+
+- 객체들이 공통적으로 사용하는 기능이 있다면 모듈화 하고싶지 않은가?
+- 그 기능을 담당하는 것이 Mixins
+
+> 해당 강의를 듣던 도중에 ` public toggle() { this.show = !this.show; }`라고 작성하였을 때 리턴값을 지정해주어야 한다고 경고가 떠서 뒤에 :void를 붙여 해결하였음
+
+```typescript
+export default class Dropdown extends Mixins(toggle)
+```
+
+와 같이 다중 상속을 받을 수 있는데 이 때 Mixins의 인자값으로 사용할 수 있는 개수는 5개 까지이다
+
+</div>
+</details>
+
+6. Interface로 Vuex 설계하기
