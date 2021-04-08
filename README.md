@@ -123,7 +123,7 @@ npm run lint
 ```
 
 <details>
-<summary>5. Class-Based 컴포넌트 만들기 (길어져서 flip으로 변경)</summary>
+<summary>5. Class-Based 컴포넌트 만들기</summary>
 <div markdown="5">
 (1) @Component
 
@@ -558,13 +558,100 @@ export default class App extends Vue {}
 
   - 해당 강의에서는 `created() { console.log(this.$store)}`로 스토어 값을 확인하였지만 Vue 3.0에서는 created()와 beforeCreate()가 lifecycle에서 삭제되었고 setup()으로 변경되어서([참고](https://m.blog.naver.com/dndlab/221952030079)) setup()을 사용해보았으나 console.log()가 찍히지 않았음 → 크롬 확장도구인 Vue devtools를 사용하여 state값을 관찰함
 
-  (이미지3. 크롬 확장도구인 Vue devtools를 사용하여 Store값을 확인)
-
   - 하지만 setup() 함수에서는 this를 지원하지 않기 때문에([공식문서](https://v3.vuejs.org/guide/composition-api-introduction.html#setup-component-option)) 이를 해결하고자 최상위 RootStore를 변경하였음
 
   - Vuex 4.0의 공식문서와는 달리 createStore를 불러올 수 없었는데, 이는 npm에서 제공하는 최근 릴리즈가 v3.6.2이기 때문이었음
 
-  - vue와 vuex 및 vue-router를 최신버전(vue@3.0.11, vuex@4.0.0, vue-router@4.0.6)으로 업그레이드하고 예제를 적용해 봄 ([참고 영상](https://www.youtube.com/watch?v=fh0VboqAc8k))
+  - vue와 vuex 및 vue-router를 최신버전(vue@3.0.11, vuex@4.0.0, vue-router@4.0.6)으로 업그레이드하고 예제를 적용해 봄
+
+    [참고 영상](https://www.youtube.com/watch?v=fh0VboqAc8k) 및 [샘플 코드 브랜치](https://github.com/harrykim14/vue-with-typescript/tree/newVersionOfVuexExample)
 
   </div>
   </details>
+
+<details>
+<summary>7. 알아두면 좋은 Vuex 오픈소스</summary>
+<div markdown="7">
+  (1) vuex-module-decorator
+
+- Class style로 vuex를 작성할 수 있다
+
+```typescript
+// eg. /app/store/mymodule.ts
+import { Module, VuexModule } from "vuex-module-decorators";
+
+@Module({ namespaced: true, name: "moduleA" })
+export default class MyModule extends VuexModule {
+  data: string = "moduleA";
+
+  @Mutation
+  setData(data: string) {
+    this.data = data;
+  }
+
+  @Action
+  editData(data: string) {
+    // 원래는 emit이나 commit 등이 담긴 context를 첫번째 인자로 받음
+    // 같은 code block안에 있기 때문에 같은 이름의 함수로 작성해서는 안 된다
+    this.context.commit("setData", data);
+  }
+
+  get data() {
+    return this.data;
+  }
+}
+```
+
+(2) vuex-class
+
+- Decorator를 사용하여 State, Getter, Action 등에 접근 가능
+
+```vue
+<!-- count.vue -->
+<template>
+  <div>
+    <!-- 기존에 $store.getters.counter 로 접근하던 것을 counter 만으로도 접근 할 수 있다-->
+    {{ counter }}
+  </div>
+</template>
+
+<script lang="ts">
+import { Vue, Component } from "vue-property-decorator";
+import { Getter, State } from "vuex-class";
+
+@Component
+export default class Count extends Vue {
+  @Getter count: number;
+  // @State count: number;
+}
+</script>
+```
+
+```vue
+<!-- App.vue -->
+<template>
+  <div id="app">
+    <count></count>
+    <button @click="increase">증가</button>
+    <button @click="decrease">감소</button>
+  </div>
+</template>
+
+<script lang="ts">
+import { Vue, Component } from "vue-property-decorator";
+import { Action, Mutation } from "vuex-class";
+import count from "@/components/count.vue";
+
+@Component
+export default class App extends Vue {
+  @Action readonly increase;
+  @Action readonly decrease;
+
+  @Mutation readonly setCount;
+}
+</script>
+```
+
+</div>
+</details>
+```
