@@ -83,7 +83,6 @@ npm install --save-dev eslint @typescript-eslint/parser @typescript-eslint/eslin
 }
 ```
 
-<<<<<<< HEAD
 4. 명령어 사용해보기
 
 ```
@@ -278,11 +277,87 @@ export default class EmitComponent extends Vue {
   }
 }
 ```
-=======
-4. 실행해보기
+
+3. @Provide / @Inject
+
+```javascript
+const symbol = Symbol("baz");
+
+export const ProvideComponent = Vue.extend({
+  inject: {
+    foo: "foo",
+    bar: "bar",
+    optional: { from: "optional", default: "default" },
+    [symbol]: symbol,
+  },
+
+  data() {
+    return {
+      foo: "foo",
+      baz: "bar",
+    };
+  },
+
+  provide() {
+    return {
+      foo: this.foo,
+      bar: this.baz,
+    };
+  },
+});
 ```
-npm run serve
+
+```typescript
+const symbol = Symbol("baz");
+
+@Component
+export class ProvideComponent extends Vue {
+  @Inject() readonly foo!: string;
+  @Inject("bar") readonly bar!: string;
+  @Inject({ from: "optional", default: "default" }) readonly optional!: string;
+  @Inject(symbol) readonly baz!: string;
+
+  @Provide() foo = "foo";
+  @Provide("bar") baz = "bar";
+}
 ```
-<image src="https://user-images.githubusercontent.com/67398691/113802120-1ac56f00-9795-11eb-8346-e090aa96111d.png" width="600" alt="vue.js index page"/>
-(이미지1. Vue 프로젝트를 실행하여 localhost:8080으로 접속한 화면)
->>>>>>> 2ac077b5204983fd39ede58cf1b5c947b1354c84
+
+여기서 잠깐,
+
+```typescript
+@Provide('message') msg: string = 'provide/inject example';
+// Type string trivially inferred from a string literal, remove type annotation.
+```
+
+`@Provide('message') msg: string = 'provide/inject example'`라고 쓰니 eslint에서 string 타입 할당을 하지 않아도 된다고 한다.
+왜일까?
+이는 자바스크립트의 타입 추론을 당연하지만 타입스크립트에서도 사용하고 있기 때문인데, eslint에서 이 설정을 바꾸려면 `"no-inferrable-types": [true]`로 설정해 주면 된다
+[참고](https://server0.tistory.com/46)
+
+**그래서, Inject/provide가 props와 다른점은?** [공식 문서](https://vuejs.org/v2/api/#provide-inject)
+
+- provide/inject는 위와 같이 사용하기 간편한데에 비해 props는 `:property="value"`와 같이 데이터를 직접 주입해주어야 한다
+- 하지만 provide/inject를 매번 사용한다면 데이터의 흐름을 파악하기 어려울 것
+
+4. @Model (Property decorator)
+
+```javascript
+export default {
+  model: {
+    prop: "checked",
+    event: "change",
+  },
+  props: {
+    checked: {
+      type: Boolean,
+    },
+  },
+};
+```
+
+```typescript
+@Component
+export default class ModelComponent extends Vue {
+  @Model("change", { type: Boolean }) readonly checked!: boolean;
+}
+```
