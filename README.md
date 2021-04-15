@@ -563,15 +563,11 @@ export default class App extends Vue {}
   - Vuex 4.0의 공식문서와는 달리 createStore를 불러올 수 없었는데, 이는 npm에서 제공하는 최근 릴리즈가 v3.6.2이기 때문이었음
 
   - vue와 vuex 및 vue-router를 최신버전(vue@3.0.11, vuex@4.0.0, vue-router@4.0.6)으로 업그레이드하고 예제를 적용해 봄
-<<<<<<< HEAD
 
-=======
->>>>>>> 8e945a137bbc8b83a25cd3844e164b034a3e46fa
     [참고 영상](https://www.youtube.com/watch?v=fh0VboqAc8k) 및 [샘플 코드 브랜치](https://github.com/harrykim14/vue-with-typescript/tree/newVersionOfVuexExample)
 
   </div>
   </details>
-<<<<<<< HEAD
 
 <details>
 <summary>7. 알아두면 좋은 Vuex 오픈소스</summary>
@@ -658,6 +654,3 @@ export default class App extends Vue {
 
 </div>
 </details>
-```
-=======
->>>>>>> 8e945a137bbc8b83a25cd3844e164b034a3e46fa
